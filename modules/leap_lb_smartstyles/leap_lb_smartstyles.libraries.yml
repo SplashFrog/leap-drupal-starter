@@ -1,0 +1,5 @@
+gin_lb_helper:
+  version: 1.x
+  css:
+    theme:
+      css/gin_lb_smartstyles.css: { }

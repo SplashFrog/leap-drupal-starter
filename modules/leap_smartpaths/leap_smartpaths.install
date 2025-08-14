@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * Contains installation and update routines for Smart Paths.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function leap_smartpaths_install() {
+  module_set_weight('leap_smartpaths', 1);
+}

@@ -1,0 +1,5 @@
+gin_toolbar_environment_indicator:
+  version: 1.x
+  css:
+    theme:
+      css/gin_toolbar_environment_indicator.css: { }

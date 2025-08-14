@@ -1,0 +1,110 @@
+<?php
+/**
+ * @file
+ * Contains hooks for the module for Smart Paths.
+ */
+
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\leap_smartpaths\SmartPaths;
+
+/**
+ * Implements hook_token_info().
+ */
+function leap_smartpaths_token_info(): array {
+  $token_type = [
+    'name' => t('Nodes'),
+    'description' => t('Tokens related to the current node.'),
+    'needs-data' => 'node',
+  ];
+
+  $token_info = [
+    'parent_paths' => [
+      'name' => t('Parent Paths'),
+      'description' => t('Build path from selected parent node. (Custom)'),
+    ],
+    'optional_title' => [
+      'name' => t('Optional Title'),
+      'description' => t('Create path from either the optional field or node title. (Custom)'),
+    ]
+  ];
+
+  return [
+    'types' => [
+      'node' => $token_type,
+    ],
+    'tokens' => [
+      'node' => $token_info,
+    ],
+  ];
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function leap_smartpaths_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
+  $replacements = [];
+
+  if ($type == 'node' && !empty($data['node'])) {
+    foreach ($tokens as $name => $original) {
+      if ($name === 'parent_paths') {
+        $recursivePages = new SmartPaths();
+        $recursive_path = $recursivePages->buildParentPagePath(NULL, $data['node'], $options);
+        if (!empty($recursive_path)) {
+          $replacements[$original] = $recursive_path;
+        }
+      }
+      elseif ($name === 'optional_title') {
+        $recursivePages = new SmartPaths();
+        $optional_title = $recursivePages->buildPageTitle($data['node'], $options);
+        if (!empty($optional_title)) {
+          $replacements[$original] = $optional_title;
+        }
+      }
+    }
+  }
+
+  return $replacements;
+}
+
+/**
+ * Implements hook_pathauto_alias_alter().
+ */
+function leap_smartpaths_pathauto_alias_alter(&$alias, array &$context)
+{
+  if ($context['module'] == 'node' && $context['op'] === 'update') {
+    $node = $context['data']['node'];
+
+    // Check for moderation state. If field doesn't exist, then check absolute status of the node.
+    if ($node->hasField('moderation_state')) {
+      $mod_field = $node->get('moderation_state')->getValue();
+      $mod = $mod_field[0]['value'];
+
+      $node_status = (in_array($mod, ['published', 'archived'])) ? $mod : "unpublished";
+    }
+    else {
+      $status_field = $node->get('status')->getValue();
+      $status = $status_field[0]['value'];
+
+      $node_status = ($status ? "published" : "unpublished");
+    }
+    switch ($node_status) {
+      case 'published':case 'archived': {
+      $node_path = $node->get('path')->getValue();
+      $node_alias = $node_path[0]['alias'];
+      $node_source = '/node/' . $node->id();
+
+      // If the source and alias are the same, or if the alias didn't change, then no children update required.
+      if ($node_alias == $node_source || $node_alias == $alias) {
+        return;
+      }
+
+      $recursivePages = new SmartPaths();
+      $recursivePages->updateChildrenPages($node);
+      break;
+    }
+      default: {
+        return;
+      }
+    }
+  }
+}

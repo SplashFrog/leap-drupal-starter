@@ -1,0 +1,10 @@
+<?php
+/**
+ * @file
+ * Contains installation and update routines for Content.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function leap_content_install() { }

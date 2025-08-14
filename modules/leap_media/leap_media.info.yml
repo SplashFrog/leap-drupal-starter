@@ -1,0 +1,16 @@
+name: 'Splash Frog - Starter - Media Types'
+core_version_requirement: ^10.4 || ^11
+type: module
+version: '1.0.0'
+description: 'Provides basic configuration to create generally-used media types. Once configuration is installed, this can be disabled.'
+package: 'Splash Frog'
+dependencies:
+  - drupal:crop
+  - drupal:scheduler
+  - drupal:file
+  - drupal:image
+  - drupal:media
+  - drupal:media_library
+  - drupal:media_entity_download
+  - drupal:path
+  - drupal:focal_point

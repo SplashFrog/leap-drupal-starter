@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node_archive_content
+label: 'Archive content'
+type: node
+plugin: archive_node_action
+configuration: {  }

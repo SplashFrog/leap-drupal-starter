@@ -1,0 +1,9 @@
+name: 'Splash Frog - Starter - Enhanced Blocks'
+core_version_requirement: ^10.4 || ^11
+type: module
+version: '1.0.0'
+description: 'Provides a way to enhance your content blocks by providing a class for other custom modules to use. For more enhance ability, there is also a method for Paragraphs too.'
+package: 'Splash Frog'
+dependencies:
+  - drupal:block_content
+  - drupal:paragraphs

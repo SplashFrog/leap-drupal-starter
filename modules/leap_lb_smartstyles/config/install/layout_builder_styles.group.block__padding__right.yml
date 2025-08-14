@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__padding__right
+label: 'Padding - Right'
+multiselect: single
+form_type: checkboxes
+required: false
+weight: 7

@@ -1,0 +1,11 @@
+name: 'Splash Frog - Starter - Users'
+core_version_requirement: ^10.4 || ^11
+type: module
+version: '1.0.0'
+description: 'Provides basic configuration for user accounts. Once configuration is installed, this can be disabled.'
+package: 'Splash Frog'
+dependencies:
+  - drupal:field
+  - drupal:text
+  - drupal:user
+  - drupal:leap_admin

@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: general
+label: General
+revision: true
+description: 'A general content block with a WYSIWYG.'

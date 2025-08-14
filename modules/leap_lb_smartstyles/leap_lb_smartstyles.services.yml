@@ -1,0 +1,7 @@
+services:
+  leap_lb_smartstyles.render_block_component_subscriber:
+    class: Drupal\leap_lb_smartstyles\EventSubscriber\BlockComponentRenderArraySubscriber
+    decorates: layout_builder_styles.render_block_component_subscriber
+    arguments: ['@leap_lb_smartstyles.render_block_component_subscriber.inner', '@entity_type.manager', '@config.factory']
+    tags:
+    - { name: 'event_subscriber' }

@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__margin__left
+label: 'Margin - Left'
+multiselect: single
+form_type: checkboxes
+required: false
+weight: 10

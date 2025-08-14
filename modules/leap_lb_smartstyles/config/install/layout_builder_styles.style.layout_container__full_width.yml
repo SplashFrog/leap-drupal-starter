@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: layout_container__full_width
+label: 'Full Width'
+classes: fluid
+type: section
+group: layout_container
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -9

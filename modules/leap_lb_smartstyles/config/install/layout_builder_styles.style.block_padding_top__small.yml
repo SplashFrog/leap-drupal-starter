@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block_padding_top__small
+label: Small
+classes: pt-1
+type: component
+group: block__padding__top
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 0

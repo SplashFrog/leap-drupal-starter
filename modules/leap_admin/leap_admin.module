@@ -1,0 +1,60 @@
+<?php
+/**
+ * @file
+ * Contains hooks for the module for Administrative Enhancements.
+ */
+
+use Symfony\Component\Yaml\Yaml;
+
+/**
+ * Implements hook_page_attachments().
+ */
+function leap_admin_page_attachments(array &$attachments) {
+  $user = \Drupal::currentUser();
+
+  // Check if the user is authenticated (logged in) AND has permission
+  // to access the toolbar. The 'access toolbar' permission is standard.
+  if ($user->isAuthenticated() && $user->hasPermission('access toolbar')) {
+    $attachments['#attached']['library'][] = 'leap_admin/gin_toolbar_environment_indicator';
+  }
+}
+
+/**
+ * Callable custom function to update / override existing config from what is on disk in the module.
+ *
+ * @param string $configName
+ *   The configuration name.
+ * @param bool $hasUUID
+ *   Whether to check / generate a UUID for the configuration.
+ * @param string $location
+ *   The location of the configuration file.
+ *
+ * @return void
+ */
+function _leap_admin_override_config(string $configName, bool $hasUUID = TRUE, string $location = '/config/optional/') {
+  $existingConfig = \Drupal::configFactory()->getEditable($configName);
+  if ($existingConfig) {
+    if ($hasUUID) {
+      // Get the UUID that already exists. If it doesn't, generate a new one.
+      $uuid = $existingConfig->get('uuid');
+      if (!$uuid) {
+        $uuid = \Drupal::service('uuid')->generate();
+      }
+    }
+
+    $modulePath = \Drupal::moduleHandler()->getModule('leap_admin')->getPath();
+
+    $file = DRUPAL_ROOT . '/' . $modulePath . $location . $configName . '.yml';
+    if (file_exists($file)) {
+      $fileConfig = Yaml::parseFile($file);
+
+      $newConfig = ($hasUUID ? array_merge(['uuid' => $uuid], $fileConfig) : $fileConfig);
+
+      $existingConfig->setData($newConfig);
+      $existingConfig->save();
+    }
+    else {
+      \Drupal::logger('leap_admin')->warning('Config file not found: ' . $configName);
+    }
+  }
+}

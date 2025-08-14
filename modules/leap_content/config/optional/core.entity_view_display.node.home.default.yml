@@ -1,0 +1,94 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.home.body
+    - field.field.node.home.layout_builder__layout
+    - node.type.home
+  module:
+    - layout_builder
+    - layout_builder_restrictions
+    - layout_discovery
+    - text
+    - user
+third_party_settings:
+  layout_builder:
+    enabled: true
+    allow_custom: true
+    sections:
+      -
+        layout_id: layout_onecol
+        layout_settings:
+          label: ''
+        components:
+          4587a593-d9e4-4942-8c90-26ca4a9f57dc:
+            uuid: 4587a593-d9e4-4942-8c90-26ca4a9f57dc
+            region: content
+            configuration:
+              id: 'extra_field_block:node:home:links'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+            weight: 0
+            additional: {  }
+          a35c3c83-6ae8-4262-a367-0438dc201f2d:
+            uuid: a35c3c83-6ae8-4262-a367-0438dc201f2d
+            region: content
+            configuration:
+              id: 'field_block:node:home:body'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: text_default
+                label: hidden
+                settings: {  }
+                third_party_settings: {  }
+            weight: 1
+            additional: {  }
+          8eaa5c77-8f5e-45a9-b0b0-a00bfc96ac14:
+            uuid: 8eaa5c77-8f5e-45a9-b0b0-a00bfc96ac14
+            region: content
+            configuration:
+              id: 'extra_field_block:node:home:content_moderation_control'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+            weight: 2
+            additional: {  }
+        third_party_settings: {  }
+  layout_builder_restrictions:
+    allowed_block_categories: {  }
+    entity_view_mode_restriction:
+      allowed_layouts: {  }
+      denylisted_blocks: {  }
+      allowlisted_blocks: {  }
+      restricted_categories: {  }
+    entity_view_mode_restriction_by_region:
+      allowed_layouts: {  }
+id: node.home.default
+targetEntityType: node
+bundle: home
+mode: default
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 103
+    region: content
+  content_moderation_control:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -20
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  langcode: true
+  layout_builder__layout: true
+  search_api_excerpt: true

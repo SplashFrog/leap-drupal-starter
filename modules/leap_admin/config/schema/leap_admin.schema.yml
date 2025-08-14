@@ -1,0 +1,8 @@
+# set up the actions for bulk operations for publish, archive and unpublish on /admin/content view.
+action.configuration.leap_node_archive_action:
+  type: action_configuration_default
+  label: 'Archive current revision'
+
+action.configuration.leap_node_publish_action:
+  type: action_configuration_default
+  label: 'Publish latest revision'

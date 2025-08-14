@@ -1,0 +1,10 @@
+name: 'Splash Frog - Starter - Layout Builder Smart Styles'
+core_version_requirement: ^10.4 || ^11
+type: module
+version: '1.0.0'
+description: 'Provides an enhancement combining Layout Builder and Layout Builder Styles to be easily included in layout templates. This includes some preset layout builder styles for layouts and blocks.'
+package: 'Splash Frog'
+dependencies:
+  - drupal:block_content
+  - drupal:layout_builder
+  - drupal:layout_builder_styles

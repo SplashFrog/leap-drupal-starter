@@ -1,0 +1,25 @@
+name: 'Splash Frog - Starter - Content Types'
+core_version_requirement: ^10.4 || ^11
+type: module
+version: '1.0.0'
+description: 'Provides basic configuration to create generally-used content types. These content types will utilize Layout Builder, Workflows, etc.  Once configuration is installed, this can be disabled.'
+package: 'Splash Frog'
+dependencies:
+  - drupal:ckeditor5
+  - drupal:content_moderation
+  - drupal:editor
+  - drupal:field
+  - drupal:layout_builder
+  - drupal:layout_builder_restrictions
+  - drupal:layout_discovery
+  - drupal:menu_ui
+  - drupal:moderated_content_bulk_publish
+  - drupal:node
+  - drupal:path
+  - drupal:scheduler
+  - drupal:scheduler_content_moderation_integration
+  - drupal:search_api_exclude
+  - drupal:simple_sitemap
+  - drupal:text
+  - drupal:user
+  - drupal:workflows

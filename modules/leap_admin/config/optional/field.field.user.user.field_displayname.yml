@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_displayname
+  module:
+    - user
+id: user.user.field_displayname
+field_name: field_displayname
+entity_type: user
+bundle: user
+label: 'Display Name'
+description: 'An alternative display name used by content managers.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

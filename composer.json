@@ -1,0 +1,22 @@
+{
+  "name": "splashfrog/drupal-starter",
+  "description": "Splash Frog - Drupal Starter Kit",
+  "type": "drupal-module",
+  "homepage": "https://github.com/SplashFrog/leap-drupal-starter",
+  "authors": [
+    {
+      "name": "Splash Frog",
+      "email": "contact@splashfrog.io",
+      "homepage": "https://splashfrog.io",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/SplashFrog/leap-drupal-starter/issues",
+    "source": "https://github.com/SplashFrog/leap-drupal-starter.git"
+  },
+  "require" : {
+    "drupal/core": "^10.4 || ^11"
+  },
+  "license": "GPL-3.0-or-later"
+}

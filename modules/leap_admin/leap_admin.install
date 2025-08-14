@@ -1,0 +1,27 @@
+<?php
+/**
+ * @file
+ * Contains installation and update routines for Admin interface changes.
+ */
+
+use Symfony\Component\Yaml\Yaml;
+
+/**
+ * Implements hook_install().
+ */
+function leap_admin_install() {
+  module_set_weight('leap_admin', 1);
+
+  // During installation, make sure to update core views / configuration.
+  _leap_admin_override_config('views.view.content');
+  _leap_admin_override_config('views.view.media');
+  _leap_admin_override_config('views.view.media_library');
+  _leap_admin_override_config('views.view.user_admin_people');
+
+  // Disable the Moderated Content view as that is now the default Content view.
+  $moderatedView = \Drupal::configFactory()->getEditable('views.view.moderated_content');
+  if ($moderatedView) {
+    $moderatedView->set('status', false);
+    $moderatedView->save();
+  }
+}

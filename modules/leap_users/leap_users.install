@@ -1,0 +1,10 @@
+<?php
+/**
+ * @file
+ * Contains installation and update routines for Users.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function leap_users_install() { }

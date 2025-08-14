@@ -1,0 +1,10 @@
+<?php
+/**
+ * @file
+ * Contains installation and update routines for Media.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function leap_media_install() { }

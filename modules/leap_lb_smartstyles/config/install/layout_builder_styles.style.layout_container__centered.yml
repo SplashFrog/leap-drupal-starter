@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: layout_container__centered
+label: Centered
+classes: center
+type: section
+group: layout_container
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -10

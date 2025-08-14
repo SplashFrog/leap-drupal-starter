@@ -1,0 +1,5 @@
+services:
+  leap_admin.route_subscriber:
+    class: Drupal\leap_admin\Routing\AdminRouteSubscriber
+    tags:
+      - { name: event_subscriber }

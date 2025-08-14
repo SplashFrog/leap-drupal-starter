@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node_archive_content
+label: 'Archive content'
+type: node
+plugin: leap_node_archive_action
+configuration: {  }

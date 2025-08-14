@@ -1,0 +1,4 @@
+/* This is to fix the toolbar + Gin bug. */
+.toolbar .toolbar-tray.is-active {
+    display: none;
+}

@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block_align_center
+label: Center
+classes: align-center
+type: component
+group: block__general__alignment
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -6

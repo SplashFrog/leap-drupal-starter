@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: layout_border_top
+label: 'Border - Top'
+multiselect: single
+form_type: checkboxes
+required: false
+weight: -10
