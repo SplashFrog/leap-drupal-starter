@@ -9,6 +9,5 @@ dependencies:
   - drupal:node
   - drupal:user
   - drupal:pathauto
-  - drupal:tagify
   - drupal:token
   - drupal:views
