@@ -1,1 +1,16 @@
 <?php
+
+/**
+ * Implements template_preprocess_HOOK().
+ */
+function leap_blocks_preprocess_field(&$variables) {
+  if (!array_key_exists('entity_id', $variables)) {
+    if (array_key_exists('#object', $variables['element'])) {
+      $entity = $variables['element']['#object'];
+      if (method_exists($entity, 'id')) {
+        $entityID = $entity->id();
+        $variables['entity_id'] = $entityID;
+      }
+    }
+  }
+}
