@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__border_space__small
+label: Small
+classes: border-space-2
+type: component
+group: block__border__space
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 19

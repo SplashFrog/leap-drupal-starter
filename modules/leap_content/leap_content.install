@@ -1,10 +1,29 @@
 <?php
+
 /**
  * @file
- * Contains installation and update routines for Content.
+ */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Installation and update functions for the LEAP Starter - Content module.
  */
 
 /**
  * Implements hook_install().
+ *
+ * Provides a post-installation messenger alert with the required Drush recipe
+ * command to install the core Content Types (Basic, Landing, Home) with their
+ * Layout Builder and Workflow configurations.
  */
-function leap_content_install() { }
+function leap_content_install(): void {
+  // Dynamically determine the path for the recipe command.
+  $module_path = \Drupal::service('extension.list.module')->getPath('leap_content');
+  $command = "drush recipe $module_path/recipes/leap_content";
+
+  \Drupal::messenger()->addWarning(t('The Splash Frog Content Lifecycle module has been enabled. <strong>To install the pre-configured Basic, Home, and Landing content types, you must apply the associated recipe:</strong><br><br><code>@command</code>', [
+    '@command' => $command,
+  ]));
+}

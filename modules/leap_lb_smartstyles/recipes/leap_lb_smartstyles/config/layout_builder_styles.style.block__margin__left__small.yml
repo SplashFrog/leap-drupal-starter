@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__margin__left__small
+label: Small
+classes: ms-2
+type: component
+group: block__margin__left
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 39

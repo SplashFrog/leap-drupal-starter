@@ -1,6 +1,6 @@
 {
   "name": "splashfrog/leap-starter",
-  "description": "Splash Frog - Drupal Starter Kit",
+  "description": "The architectural foundation for enterprise Drupal 11 applications.",
   "type": "drupal-module",
   "homepage": "https://github.com/SplashFrog/leap-drupal-starter",
   "authors": [
@@ -15,8 +15,20 @@
     "issues": "https://github.com/SplashFrog/leap-drupal-starter/issues",
     "source": "https://github.com/SplashFrog/leap-drupal-starter.git"
   },
-  "require" : {
-    "drupal/core": "^10.4 || ^11"
+  "require": {
+    "php": ">=8.3",
+    "drupal/core": "^11.3",
+    "drupal/layout_builder_styles": "^2.0",
+    "drupal/pathauto": "^1.12",
+    "drupal/paragraphs": "^1.17"
+  },
+  "autoload": {
+    "psr-4": {
+      "Drupal\\leap_admin\\": "modules/leap_admin/src/",
+      "Drupal\\leap_blocks\\": "modules/leap_blocks/src/",
+      "Drupal\\leap_content\\": "modules/leap_content/src/",
+      "Drupal\\leap_lb_smartstyles\\": "modules/leap_lb_smartstyles/src/"
+    }
   },
   "license": "GPL-3.0-or-later"
 }

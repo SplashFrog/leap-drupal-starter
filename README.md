@@ -1,27 +1,70 @@
-# Drupal - Starter Kit
+# Splash Frog - LEAP Starter
 
-This Drupal Module comes with some pre-defined sub-modules to help get a Drupal Website configured, as well as some enhanced functionality.
+**The architectural foundation for enterprise Drupal 11 applications.**
 
-**WARNING:** While there aren't any strict composer requirements on this package, there are some Drupal requirements / additional contrib modules that are necessary. Please view the `Extend` and review the `Requires:` list for each of the following.
+The LEAP Starter ecosystem is a collection of essential tools, services, and configuration recipes that scaffold a modern, scalable Drupal 11 website. It provides solutions for complex core edge-cases (like nested draft publishing), introduces robust URL hierarchy management, and establishes a low-code design system via Layout Builder.
 
-### Administrative Enhancements
-This module helps by giving an enhanced version of the general /admin/content, /admin/content/media views. It also introduces some Bulk Actions that will help with Publishing and Archiving revision content, general pathauto patterns, and more.
+---
 
-### Starter Blocks
-This module introduces a general block content called 'General', and also gives a usable class to be able to call, send through a keyed (optional, but helpful) array of specified fields for block fields or paragraph fields. What this will do is then take the values of those fields, and set them as twig variables in nested arrays. For blocks, the initiating twig variable is `block_options` and for paragraphs, it is `paragraph_options`. If you set your desired fields when you utilize the class as key => value, the key will be the variable in twig you can then reference. Otherwise, it will be the machine name of the field.
+## ✨ Architectural Philosophy
 
+Legacy starter kits often rely on rigid Installation Profiles or brittle `config/install` directories that break when site builders need to customize standard structures.
 
-### Smart Paths
-This module introduces two content type fields: A Reference Field called `Parent Content` and an Optional Title field called `Optional Path`. Together, along with the pathauto pattern, this will help give your site a way to nest content within their respective paths. In addition, if you update a path that has sub paths associated with it, those other pieces of content will have their paths updated as well.
+**The LEAP Approach:**
+1. **Decoupled Configuration (Recipes):** We do not force configuration upon module installation. Instead, we use Drupal 11 Configuration Recipes (`drush recipe ...`). This allows site builders to opt-in to the specific content types, media types, or administrative views they need, when they need them.
+2. **Service-Oriented Architecture:** Complex business logic (like URL alias cascading or recursive publishing) is housed in strictly typed, PHP 8.3+ injectable services, ensuring the codebase is testable and extensible.
+3. **Graceful Degradation:** The modules are built defensively. If a site builder deletes an optional field provided by a recipe, the backend logic degrades gracefully rather than throwing fatal exceptions.
 
-### Smart Layout Styles
-This module introduces a split for the utilization of Layout Builder Styles. Meaning this takes the defined and set customized styles out of the full `attributes.class` and puts them into their own arrays for easier use in designing Layout Builder twig templates and styling. This is also enhanced further for layout block styles. By utilizing a machine naming convention such as `block__{group_name}__{field_name}` for the naming convention of your Layout Builder Styles Groups and Options for blocks, this will make the block form easier to manage, grouping the fields in easy-to-use groups and detail display. It will also take the CSS classes and provide them within twig template variables, beginning with `smart_styles.{group_name}`, as well as a general `smart_styles_combined`. 
+---
 
-### Starter Content
-This module creates three different content types: Basic, Landing, and Home Pages. Once you enable and the configuration is imported, you can then disable this module, making it a clean end-result.
+## 🛠️ Requirements
 
-### Starter Media
-This module helps create the basic media types a site could use: Document, Image, Audio, Remote Video and Local Video. Once you enable and the configuration is imported, you can then disable this module, making it a clean end-result.
+- **Drupal:** ^11.3
+- **PHP:** >=8.3
+- **Core Ecosystem:** `layout_builder`, `media`, `content_moderation`, `pathauto`, `workflows`
 
-### Starter Users
-This module helps define additional fields for your users. Once you enable and the configuration is imported, you can then disable this module, making it a clean end-result.
+---
+
+## 🚀 Installation & Setup
+
+Because this is an ecosystem of sub-modules, you only enable what you need. Each sub-module includes an installation hook that will prompt you with the exact Drush command required to apply its accompanying configuration recipe.
+
+**Example:**
+```bash
+drush en leap_content
+drush recipe modules/contrib/leap-starter/modules/leap_content/recipes/leap_content
+```
+
+---
+
+## 🧩 The Starter Modules
+
+### Content Lifecycle (`leap_content`)
+Provides the core Content Types (Basic, Landing, Home) configured for Layout Builder and Content Moderation.
+*   **The Core Bug:** Drupal Core has a known issue where publishing a Draft node via bulk actions or the moderation widget *fails* to publish any nested Draft revisions of Inline Blocks or Paragraphs attached to that node.
+*   **The Fix:** This module provides the `RecursivePublishingService`. It intercepts the `hook_entity_update` cycle, detects if a parent entity was just published, and aggressively traverses its structure to explicitly promote any stuck child entities (Blocks/Paragraphs) to their Default (Live) revision.
+
+### Administrative Enhancements (`leap_admin`)
+Replaces the default Drupal content screens with highly optimized Views for Content and Media management.
+*   **Bulk Moderation Service:** Provides a robust service and custom Action Plugins for safely transitioning nodes between workflow states (e.g., Bulk Archive, Bulk Publish) across all language translations while maintaining accurate revision logs.
+*   **Routing & UI:** Surgically removes redundant core routes (like the standalone "Moderated Content" tab) and injects environment indicators into the Gin admin toolbar.
+
+### Layout Builder Smart Styles (`leap_lb_smartstyles`)
+Transforms Layout Builder into a low-code design tool by extending the contrib Layout Builder Styles module.
+*   **UI Organization:** Automatically parses style machine names (e.g., `block__background__dark`) to reorganize the messy block configuration form into clean Vertical Tabs.
+*   **Twig Bucketing:** Instead of dumping all CSS classes into a single root array, the `SmartStylesManager` extracts and buckets them into granular Twig variables (`layout_container`, `layout_styles`, `smart_styles`). This allows frontend developers to route specific CSS utility classes to deep DOM elements within Single Directory Components (SDCs).
+
+### Block Utilities (`leap_blocks`)
+Provides a general-purpose Block type and the essential `OptionsBuilderService`.
+*   This service acts as a bridge between Drupal's strict backend machine names (which use underscores) and frontend CSS/SDC requirements (which prefer hyphens). It extracts field values (like color pickers or alignment dropdowns) and sanitizes them into a clean array for Twig consumption.
+
+### Media Types (`leap_media`)
+A lightweight bridging module that provides the configuration recipe to scaffold out the site's foundational Media architecture (Document, Image, Audio, Remote Video, Local Video).
+
+### User Accounts (`leap_users`)
+A lightweight bridging module that provides the configuration recipe to establish basic user architecture, including administrative roles and essential fields like First Name and Last Name.
+
+---
+
+## 🛡️ License
+This module is part of the Splash Frog Ecosystem, the Drupal Ecosystem, and is provided under the GPL-2.0-or-later License.

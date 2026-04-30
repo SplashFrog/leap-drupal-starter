@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: layout_container__bg_color__tertiary
+label: 'Tertiary (Gold/Yellow)'
+classes: layout-bg--tertiary
+type: section
+group: layout_bg_color
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -70

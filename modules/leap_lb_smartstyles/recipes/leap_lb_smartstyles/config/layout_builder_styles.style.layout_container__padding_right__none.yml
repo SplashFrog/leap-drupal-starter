@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: layout_container__padding_right__none
+label: None
+classes: pe-0
+type: section
+group: layout_padding_right
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -16

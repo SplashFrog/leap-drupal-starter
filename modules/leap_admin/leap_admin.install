@@ -1,27 +1,31 @@
 <?php
+
 /**
  * @file
- * Contains installation and update routines for Admin interface changes.
  */
 
-use Symfony\Component\Yaml\Yaml;
+declare(strict_types=1);
+
+/**
+ * @file
+ * Installation and update routines for the LEAP Starter - Admin module.
+ */
 
 /**
  * Implements hook_install().
+ *
+ * Sets the module weight to ensure route subscribers execute with the
+ * correct priority and provides a messenger prompt for the administrative recipe.
  */
-function leap_admin_install() {
+function leap_admin_install(): void {
+  // Ensure this module runs after core modules for route subscribing priorities.
   module_set_weight('leap_admin', 1);
 
-  // During installation, make sure to update core views / configuration.
-  _leap_admin_override_config('views.view.content');
-  _leap_admin_override_config('views.view.media');
-  _leap_admin_override_config('views.view.media_library');
-  _leap_admin_override_config('views.view.user_admin_people');
+  // Dynamically determine the path for the recipe command.
+  $module_path = \Drupal::service('extension.list.module')->getPath('leap_admin');
+  $command = "drush recipe $module_path/recipes/leap_admin";
 
-  // Disable the Moderated Content view as that is now the default Content view.
-  $moderatedView = \Drupal::configFactory()->getEditable('views.view.moderated_content');
-  if ($moderatedView) {
-    $moderatedView->set('status', false);
-    $moderatedView->save();
-  }
+  \Drupal::messenger()->addWarning(t('The Splash Frog Administrative Enhancements module has been enabled. <strong>To install the enhanced Views and Pathauto patterns, you must apply the associated recipe:</strong><br><br><code>@command</code>', [
+    '@command' => $command,
+  ]));
 }

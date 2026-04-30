@@ -1,5 +1,40 @@
 <?php
+
 /**
  * @file
- * Contains hooks for the module for Media.
  */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Hook implementations for the LEAP Starter - Media module.
+ *
+ * This module primarily acts as a bridging agent for discovering and
+ * applying the core Media Types configuration recipe. The recipe establishes
+ * the foundational media entities (Audio, Document, Image, Video, Remote Video)
+ * used throughout the LEAP ecosystem.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Provides documentation and instructions for site builders on how to apply
+ * the accompanying Drupal Recipe to scaffold out the site's media architecture.
+ */
+function leap_media_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.leap_media') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_media');
+    $command = "drush recipe $module_path/recipes/leap_media";
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('This module serves as a helper to discover the Splash Frog Media Types recipe. The recipe itself installs and configures standard media types (Audio, Document, Image, Video, Remote Video) and their associated fields.') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the pre-configured media types, you must run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    return $output;
+  }
+  return '';
+}

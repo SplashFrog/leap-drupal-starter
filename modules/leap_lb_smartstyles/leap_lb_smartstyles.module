@@ -1,31 +1,55 @@
 <?php
+
 /**
  * @file
- * Contains hooks for the module for Layout Builder - Smart Styles.
+ */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Hook implementations for the LEAP Starter - LB SmartStyles module.
+ *
+ * This module extends the functionality of the contributed Layout Builder Styles
+ * module. Instead of blindly injecting all CSS classes into the root wrapper,
+ * it extracts, categorizes, and buckets the classes into granular Twig variables
+ * (`smart_styles` and `layout_styles`), empowering frontend developers to apply
+ * specific styling rules to deep DOM elements within SDCs.
  */
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\NodeInterface;
 use Drupal\media\MediaInterface;
-use Drupal\leap_lb_smartstyles\LayoutSmartStylesBlock;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Implements hook_help().
+ *
+ * Provides documentation and usage examples for the SmartStyles module,
+ * explaining the specific variable arrays exposed to Twig templates.
  */
-function leap_lb_smartstyles_help($route_name, $route_match) {
+function leap_lb_smartstyles_help(string $route_name, RouteMatchInterface $route_match): string {
   if ($route_name === 'help.page.leap_lb_smartstyles') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_lb_smartstyles');
+    $command = "drush recipe $module_path/recipes/leap_lb_smartstyles";
+
     $output = '<p>' . t('This module helps by extracting the various Layout Builder Styles designated for Layouts from the full default attributes.class array and puts them into the following:') . '</p>';
     $output .= '<ul>';
     $output .= '<li><strong>layout_container</strong>: ' . t('A specific array that sets the classes defined for the Layout Container options (layout_container__full_width or layout_container__centered).') . '</li>';
     $output .= '<li><strong>layout_full_width</strong>: ' . t('A Boolean to help determine during the twig theming whether the selected option is for a full page width or not.') . '</li>';
     $output .= '<li><strong>layout_styles</strong>: ' . t('An array containing all of the rest of the defined and set Layout Styles classes.') . '</li>';
     $output .= '</ul>';
-    $output .= '<p>' . t('A simple example of rendering the arrays in twig: {{ layout_styles|join( \' \')|trim }}') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the foundational spacing and alignment Layout Builder Styles, you must run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    $output .= '<p>' . t('A simple example of rendering the arrays in twig: <code>{{ layout_styles|join(\' \')|trim }}</code>') . '</p>';
     $output .= '<p>' . t('This module also helps in the rendering of Layout Builder Styles fields for blocks. By following a simple pattern, you can help keep these fields organized. The pattern is:') . '</p>';
     $output .= '<p>' . t('"block__{group_name}__{field_name}", where {group_name} is what you want the group label to say, and the {field_name} is the field name you desire. Use this pattern on the style group for the form organization.') . '</p>';
     $output .= '<p>' . t('By using this pattern on the block options (where the CSS classes are defined), it will open up options for you in twig. Those options are:') . '</p>';
     $output .= '<p>' . t('"smart_styles" - a multi-part array where the keys are the defined {group_name}. If you do not follow the pattern above, then they will be put into a "general" key.') . '</p>';
     $output .= '<p>' . t('"smart_styles_combined" - a simple array of all the CSS classes that can be added where you want in the twig file.') . '</p>';
+    $output .= '<h3>' . t('Smart Styles Manager Service') . '</h3>';
+    $output .= '<p>' . t('Developers can interact with the underlying bucketing and form-alter logic using the <code>leap_lb_smartstyles.manager</code> service.') . '</p>';
     return $output;
   }
 
@@ -33,156 +57,89 @@ function leap_lb_smartstyles_help($route_name, $route_match) {
 }
 
 /**
- * Implements HOOK_form_alter().
+ * Implements hook_form_alter().
+ *
+ * Intercepts the Layout Builder block configuration forms to reorganize the
+ * flat list of style toggles into a cleaner, tabbed UI utilizing vertical tabs
+ * based on the machine name bucketing pattern.
  */
-function leap_lb_smartstyles_form_alter(&$form, $form_state, $form_id) {
+function leap_lb_smartstyles_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
   // Only looking for the layout builder add and update block forms.
-  if ($form['#form_id'] === 'layout_builder_add_block' || $form['#form_id'] === 'layout_builder_update_block') {
-    $lbStyles = new LayoutSmartStylesBlock();
-    $form = $lbStyles->updateLayoutBuilderForm($form);
+  if (in_array($form_id, ['layout_builder_add_block', 'layout_builder_update_block'], TRUE)) {
+    \Drupal::service('leap_lb_smartstyles.manager')->reorganizeStylesForm($form);
   }
-}
-
-function _leap_lb_smartstyles_layout_builder_styles_submit_block_form(array $form, FormStateInterface $formState) {
-  /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
-  $formObject = $formState->getFormObject();
-  $component = $formObject->getCurrentComponent();
-
-  $lbStyles = new LayoutSmartStylesBlock();
-  $selectedStyles = $lbStyles->updateSubmitBlockForm($form, $formState);
-
-  $component->set('layout_builder_styles_style', $selectedStyles);
 }
 
 /**
- * Implements hook_preprocess_hook().
+ * Custom submit handler for Layout Builder styles.
+ *
+ * Because we drastically altered the form structure using Vertical Tabs,
+ * the original contrib module's submit handler fails to extract the values.
+ * This custom handler delegates extraction to our Manager service.
  */
-function leap_lb_smartstyles_preprocess_layout(&$variables) {
-  $type = NULL;
-  $entityType = NULL;
-  $hasPermission = false;
+function _leap_lb_smartstyles_layout_builder_styles_submit_block_form(array $form, FormStateInterface $form_state): void {
+  /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $form_object */
+  $form_object = $form_state->getFormObject();
+  $component = $form_object->getCurrentComponent();
 
-  // By checking the route parameter of either node or media, build the permissions to check the
-  // current user could have. If they have it, then we will want to add the library to it.
+  $selected_styles = \Drupal::service('leap_lb_smartstyles.manager')->getStylesFromFormState($form_state);
+  $component->set('layout_builder_styles_style', $selected_styles);
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for layout templates.
+ *
+ * Extracts Layout-level style selections (e.g., Section Backgrounds, Padding)
+ * and organizes them into the Twig variables defined in the hook_help text.
+ */
+function leap_lb_smartstyles_preprocess_layout(array &$variables): void {
+  // 1. Handle permission-based library attachment for the Layout Builder UI helper.
   $user = \Drupal::currentUser();
-  $routeMatch = \Drupal::routeMatch();
+  $route_match = \Drupal::routeMatch();
+  $entity = $route_match->getParameter('node') ?: $route_match->getParameter('media');
 
-  $node = $routeMatch->getParameter('node');
-  $media = $routeMatch->getParameter('media');
+  if ($entity instanceof NodeInterface || $entity instanceof MediaInterface) {
+    $bundle = $entity->bundle();
+    $entity_type = $entity->getEntityTypeId();
 
-  if ($node instanceof NodeInterface) {
-    $type = $node->bundle();
-    $entityType = 'node';
-  }
-  elseif ($media instanceof MediaInterface) {
-    $type = $media->bundle();
-    $entityType = 'media';
-  }
-
-  if ($type) {
-    $typePermissions = [
-      'configure editable ' . $type . ' ' . $entityType . ' layout overrides',
-      'configure all ' . $type . ' ' . $entityType . ' layout overrides',
+    $permissions = [
+      "configure editable {$bundle} {$entity_type} layout overrides",
+      "configure all {$bundle} {$entity_type} layout overrides",
       'create and edit custom blocks',
     ];
 
-    foreach ($typePermissions as $permission) {
-      $hasPermission = $user->hasPermission($permission);
-      if ($hasPermission) {
+    foreach ($permissions as $permission) {
+      if ($user->hasPermission($permission)) {
+        $variables['#attached']['library'][] = 'leap_lb_smartstyles/gin_lb_helper';
         break;
       }
     }
   }
 
-  if ($hasPermission) {
-    $variables['#attached']['library'][] = 'leap_lb_smartstyles/gin_lb_helper';
-  }
-
-  // Get the current theme and admin theme. If they are the same, exit out.
-  $current_theme = \Drupal::theme()->getActiveTheme()->getName();
+  // 2. Delegate Smart Style processing to the manager.
+  // Exit if in admin theme to prevent style bleeding into the backend UI.
   $admin_theme = \Drupal::config('system.theme')->get('admin');
-  if ($current_theme === $admin_theme) {
+  if (\Drupal::theme()->getActiveTheme()->getName() === $admin_theme) {
     return;
   }
 
-  // No layout builder styles are set. Exit out.
-  if (!array_key_exists('layout_builder_styles_style', $variables['settings'])) {
-    return;
-  }
-
-  // Go through and check the set settings for the Layout Styles.
-  $variables['layout_full_width'] = FALSE;
-  $variables['layout_container'] = [];
-  $variables['layout_styles'] = [];
-  $customStyles = [];
-  $setStyles = $variables['settings']['layout_builder_styles_style'];
-  $configPrefix = 'layout_builder_styles.style.';
-  $configFactory = \Drupal::configFactory();
-
-  foreach ($setStyles as $styleId) {
-    $splitClasses = _leap_lb_smartstyles_process_config_values($configFactory, $configPrefix . $styleId, $variables['attributes']['class']);
-    $variables['attributes']['class'] = $splitClasses['updatedClasses'];
-
-    // Set a specific variable for the layout container
-    if (str_starts_with($styleId, 'layout_container__')) {
-      if ($styleId === 'layout_container__full_width') {
-        $variables['layout_full_width'] = TRUE;
-      }
-      elseif ($styleId === 'layout_container__centered') {
-        $variables['layout_full_width'] = FALSE;
-      }
-      else {
-        $variables['layout_container'] = array_merge($variables['layout_container'], $splitClasses['separatedClasses']);
-      }
-
-    }
-    else {
-      $customStyles = array_merge($customStyles, $splitClasses['separatedClasses']);
-    }
-  }
-
-  $variables['layout_styles'] = $customStyles;
+  \Drupal::service('leap_lb_smartstyles.manager')->processLayoutVariables($variables);
 }
 
 /**
- * Implements hook_preprocess_hook().
+ * Implements hook_preprocess_HOOK() for block templates.
+ *
+ * Processes the bucketing array generated by the EventSubscriber and flattens
+ * it into accessible Twig arrays (`smart_styles` and `smart_styles_combined`).
  */
-function leap_lb_smartstyles_preprocess_block(&$variables) {
-  if (array_key_exists('elements', $variables) && is_array($variables['elements']) && array_key_exists('#smartstyles_block_classes', $variables['elements'])) {
-    $smartStyles = $variables['elements']['#smartstyles_block_classes'];
+function leap_lb_smartstyles_preprocess_block(array &$variables): void {
+  if (isset($variables['elements']['#smartstyles_block_classes'])) {
+    $smart_styles = $variables['elements']['#smartstyles_block_classes'];
     $combined = [];
-    foreach ($smartStyles as $styles) {
+    foreach ($smart_styles as $styles) {
       $combined = array_merge($combined, $styles);
     }
-    $variables['smart_styles'] = $variables['elements']['#smartstyles_block_classes'];
+    $variables['smart_styles'] = $smart_styles;
     $variables['smart_styles_combined'] = $combined;
   }
-}
-
-/**
- * @param $configFactory
- *   Drupal's Config Factory.
- * @param $configName
- *   The config to load.
- * @param $existingClasses
- *   The passed existing CSS Classes to thin out.
- *
- * @return array
- *   Multidimensional array of the separated layout classes and the remaining default classes.
- */
-function _leap_lb_smartstyles_process_config_values($configFactory, $configName, $existingClasses) {
-  $layoutStyles = [];
-  $config = $configFactory->get($configName);
-
-  $classes = $config->get('classes');
-  if (!empty($classes)) {
-    $layoutStyles = preg_split('/\r\n|\r|\n/', $classes);
-  }
-
-  $updatedClasses = array_diff($existingClasses, $layoutStyles);
-
-  return [
-    'separatedClasses' => $layoutStyles,
-    'updatedClasses' => $updatedClasses,
-  ];
 }

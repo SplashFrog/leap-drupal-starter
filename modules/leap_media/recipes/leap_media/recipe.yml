@@ -1,0 +1,17 @@
+name: 'Splash Frog - Media Types'
+description: 'Enables generally-used media types (Audio, Document, Image, Video, Remote Video) pre-configured with fields and displays.'
+type: 'Site-Building'
+install:
+  - crop
+  - focal_point
+  - file
+  - image
+  - language
+  - media
+  - media_library
+  - media_entity_download
+  - path
+  - scheduler
+  - simple_sitemap
+config:
+  strict: false

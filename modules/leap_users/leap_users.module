@@ -1,5 +1,40 @@
 <?php
+
 /**
  * @file
- * Contains hooks for the module for Users.
  */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Hook implementations for the LEAP Starter - Users module.
+ *
+ * This module primarily acts as a bridging agent for discovering and
+ * applying the core User Accounts configuration recipe. The recipe establishes
+ * foundational user fields (like First Name and Last Name) and basic
+ * administrative roles used throughout the LEAP ecosystem.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Provides documentation and instructions for site builders on how to apply
+ * the accompanying Drupal Recipe to scaffold out the site's user architecture.
+ */
+function leap_users_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.leap_users') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_users');
+    $command = "drush recipe $module_path/recipes/leap_users";
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('This module serves as a helper to discover the Splash Frog User Accounts recipe. The recipe installs basic configuration for user accounts, including First Name and Last Name fields.') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the pre-configured user fields, you must run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    return $output;
+  }
+  return '';
+}

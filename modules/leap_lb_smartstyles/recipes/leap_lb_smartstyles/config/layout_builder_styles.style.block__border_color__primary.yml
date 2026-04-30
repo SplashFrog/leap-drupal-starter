@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__border_color__primary
+label: 'Primary (Green)'
+classes: "border\r\nlayout-border--primary"
+type: component
+group: block__border__color
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 8

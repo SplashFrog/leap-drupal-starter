@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__padding__right__small
+label: Small
+classes: pe-2
+type: component
+group: block__padding__right
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 71

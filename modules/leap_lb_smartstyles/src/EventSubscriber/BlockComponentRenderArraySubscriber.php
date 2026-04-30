@@ -1,123 +1,77 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\leap_lb_smartstyles\EventSubscriber;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\layout_builder\LayoutBuilderEvents;
+use Drupal\leap_lb_smartstyles\SmartStylesManager;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Event subscriber to the initial render array.
+ * Event subscriber to process Layout Builder style classes for components.
+ *
+ * This subscriber catches blocks as they are being rendered by Layout Builder.
+ * It intercepts the style IDs configured by the editor, delegates them to
+ * the SmartStylesManager for "bucketing", and then injects that bucketed
+ * array directly into the block's render array (`#smartstyles_block_classes`)
+ * so it is available during the hook_preprocess_block phase.
  */
-class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
+final class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
 
   /**
-   * The decorated event subscriber service.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventSubscriberInterface
-   */
-  protected $original;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * Drupal\Core\Config\ConfigFactoryInterface definition.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * BlockComponentRenderArraySubscriber constructor.
+   * Constructs a new BlockComponentRenderArraySubscriber object.
    *
    * @param \Symfony\Component\EventDispatcher\EventSubscriberInterface $original
-   * *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   Access configuration.
+   *   The original contrib module subscriber (injected for priority context).
+   * @param \Drupal\leap_lb_smartstyles\SmartStylesManager $manager
+   *   The Smart Styles manager.
    */
-  public function __construct(EventSubscriberInterface $original, EntityTypeManagerInterface $entityTypeManager, ConfigFactoryInterface $config_factory) {
-    $this->original = $original;
-    $this->entityTypeManager = $entityTypeManager;
-    $this->configFactory = $config_factory;
-  }
+  public function __construct(
+    private readonly EventSubscriberInterface $original,
+    private readonly SmartStylesManager $manager,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
-    // Layout Builder also subscribes to this event to build the initial render
-    // array. We use a higher weight so that we execute after it.
-    $events[LayoutBuilderEvents::SECTION_COMPONENT_BUILD_RENDER_ARRAY] = [
-      'onBuildRender',
-      50,
+    // We use a higher weight (50) to ensure we execute after both
+    // Layout Builder core and the original layout_builder_styles contrib module.
+    return [
+      LayoutBuilderEvents::SECTION_COMPONENT_BUILD_RENDER_ARRAY => ['onBuildRender', 50],
     ];
-    return $events;
   }
 
   /**
-   * Add each component's block styles to the render array.
+   * Add each component's smart styles to the render array.
    *
    * @param \Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent $event
-   *   The section component render event.
+   *   The event object containing the component configuration.
    */
-  public function onBuildRender(SectionComponentBuildRenderArrayEvent $event) {
+  public function onBuildRender(SectionComponentBuildRenderArrayEvent $event): void {
     $build = $event->getBuild();
-    // This shouldn't happen - Layout Builder should have already created the
-    // initial build data.
     if (empty($build)) {
       return;
     }
 
-    $selectedStyles = $event->getComponent()->get('layout_builder_styles_style');
-    if ($selectedStyles) {
-      // Convert single selection to an array for consistent processing.
-      if (!is_array($selectedStyles)) {
-        $selectedStyles = [$selectedStyles];
-      }
-
-      // Pass the selected style(s) to the render array so we can use the data
-      // when adding block theme suggestions.
-      // See layout_builder_styles_theme_suggestions_block_alter().
-      $build['#layout_builder_style'] = $selectedStyles;
-      $build['#smartstyles_block_classes'] = [];
-
-      // Retrieve all styles from selection(s).
-      //if (!isset($build['#attributes']['class']) || !is_array($build['#attributes']['class'])) {
-      //  $build['#attributes']['class'] = [];
-      //}
-      foreach ($selectedStyles as $styleId) {
-        // Account for incorrectly configured component configuration which may
-        // have a NULL style ID. We cannot pass NULL to the storage handler or
-        // it will throw an exception.
-        if (empty($styleId)) {
-          continue;
-        }
-        /** @var \Drupal\layout_builder_styles\LayoutBuilderStyleInterface $style */
-        $style = $this->entityTypeManager->getStorage('layout_builder_style')->load($styleId);
-        if ($style) {
-          $splitName = explode('__', $styleId);
-          $subkey = (count($splitName) > 2 ? $splitName[1] : 'general');
-
-          $classes = \preg_split('(\r\n|\r|\n)', $style->getClasses());
-
-          $existing_classes = (is_array($build['#smartstyles_block_classes']) && array_key_exists($subkey, $build['#smartstyles_block_classes']) ? $build['#smartstyles_block_classes'][$subkey] : []);
-          $grouped_classes = array_merge($existing_classes, $classes);
-          $build['#smartstyles_block_classes'][$subkey] = $grouped_classes;
-
-          $build['#cache']['tags'][] = 'config:layout_builder_styles.style.' . $style->id();
-        }
-      }
-      $event->setBuild($build);
+    $selected_styles = $event->getComponent()->get('layout_builder_styles_style');
+    if (!$selected_styles) {
+      return;
     }
+
+    // Ensure we are working with an array.
+    $selected_ids = is_array($selected_styles) ? $selected_styles : [$selected_styles];
+
+    // Preserve IDs for core theme suggestions logic if needed.
+    $build['#layout_builder_style'] = $selected_ids;
+
+    // Delegate the complex machine-name parsing and CSS class bucketing
+    // to the manager service, and inject the result into the render pipeline.
+    $build['#smartstyles_block_classes'] = $this->manager->bucketBlockStyles($selected_ids);
+
+    $event->setBuild($build);
   }
 
 }

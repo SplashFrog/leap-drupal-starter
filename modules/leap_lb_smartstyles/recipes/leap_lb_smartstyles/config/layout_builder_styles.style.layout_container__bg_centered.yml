@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: layout_container__bg_centered
+label: 'Centered Background'
+classes: center-bg
+type: section
+group: layout_bg_container
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -74

@@ -1,0 +1,5 @@
+services:
+  leap_content.recursive_publishing:
+    class: Drupal\leap_content\Service\RecursivePublishingService
+    arguments:
+      - '@entity_type.manager'

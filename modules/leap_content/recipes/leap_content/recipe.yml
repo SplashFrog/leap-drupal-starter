@@ -1,0 +1,24 @@
+name: 'Splash Frog - Content Types'
+description: 'Provides basic configuration to create generally-used content types (Basic, Home, Landing) pre-configured with Layout Builder and Workflows.'
+type: 'Site-Building'
+install:
+  - ckeditor5
+  - content_moderation
+  - editor
+  - field
+  - layout_builder
+  - layout_builder_restrictions
+  - layout_discovery
+  - menu_ui
+  - moderated_content_bulk_publish
+  - node
+  - path
+  - scheduler
+  - scheduler_content_moderation_integration
+  - search_api_exclude
+  - simple_sitemap
+  - text
+  - user
+  - workflows
+config:
+  strict: false

@@ -1,60 +1,67 @@
 <?php
+
 /**
  * @file
- * Contains hooks for the module for Administrative Enhancements.
  */
 
-use Symfony\Component\Yaml\Yaml;
+declare(strict_types=1);
 
 /**
- * Implements hook_page_attachments().
+ * @file
+ * Hook implementations for the LEAP Starter - Admin module.
+ *
+ * This module provides core administrative enhancements, including bulk
+ * moderation actions, routing overrides to improve the content management
+ * experience, and environment indicators for the administration toolbar.
  */
-function leap_admin_page_attachments(array &$attachments) {
-  $user = \Drupal::currentUser();
 
-  // Check if the user is authenticated (logged in) AND has permission
-  // to access the toolbar. The 'access toolbar' permission is standard.
-  if ($user->isAuthenticated() && $user->hasPermission('access toolbar')) {
-    $attachments['#attached']['library'][] = 'leap_admin/gin_toolbar_environment_indicator';
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Provides documentation and usage examples for the Administrative Enhancements
+ * module, including instructions on applying the core administrative recipe.
+ */
+function leap_admin_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.leap_admin') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_admin');
+    $command = "drush recipe $module_path/recipes/leap_admin";
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('The Splash Frog Administrative Enhancements module provides custom actions and core UI logic. When the accompanying recipe is installed, it provides improved Views for Content and Media management.') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the enhanced Views and Pathauto patterns, you must run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    $output .= '<h3>' . t('Bulk Moderation Service') . '</h3>';
+    $output .= '<p>' . t('Developers can use the <code>leap_admin.bulk_moderation</code> service to safely transition entities between moderation states across all translations.') . '</p>';
+    $output .= '<h4>' . t('Example Usage:') . '</h4>';
+    $output .= '<pre><code>';
+    $output .= "/** @var \\Drupal\\leap_admin\\BulkModerationService \$moderation_service */\n";
+    $output .= "\$moderation_service = \\Drupal::service('leap_admin.bulk_moderation');\n";
+    $output .= "\$updated_entity = \$moderation_service->transitionNode(\$node, 'archived');\n";
+    $output .= '</code></pre>';
+    $output .= '<h3>' . t('Action Plugins') . '</h3>';
+    $output .= '<p>' . t('This module provides strictly-typed PHP 8 action plugins for bulk archiving and publishing nodes. These can be utilized in Views bulk operations.') . '</p>';
+
+    return $output;
   }
+
+  return '';
 }
 
 /**
- * Callable custom function to update / override existing config from what is on disk in the module.
+ * Implements hook_page_attachments().
  *
- * @param string $configName
- *   The configuration name.
- * @param bool $hasUUID
- *   Whether to check / generate a UUID for the configuration.
- * @param string $location
- *   The location of the configuration file.
- *
- * @return void
+ * Attaches the environment indicator library to the page for authenticated
+ * users with toolbar access. This provides a visual cue (via CSS) to help
+ * administrators distinguish between local, dev, and production environments.
  */
-function _leap_admin_override_config(string $configName, bool $hasUUID = TRUE, string $location = '/config/optional/') {
-  $existingConfig = \Drupal::configFactory()->getEditable($configName);
-  if ($existingConfig) {
-    if ($hasUUID) {
-      // Get the UUID that already exists. If it doesn't, generate a new one.
-      $uuid = $existingConfig->get('uuid');
-      if (!$uuid) {
-        $uuid = \Drupal::service('uuid')->generate();
-      }
-    }
+function leap_admin_page_attachments(array &$attachments): void {
+  $user = \Drupal::currentUser();
 
-    $modulePath = \Drupal::moduleHandler()->getModule('leap_admin')->getPath();
-
-    $file = DRUPAL_ROOT . '/' . $modulePath . $location . $configName . '.yml';
-    if (file_exists($file)) {
-      $fileConfig = Yaml::parseFile($file);
-
-      $newConfig = ($hasUUID ? array_merge(['uuid' => $uuid], $fileConfig) : $fileConfig);
-
-      $existingConfig->setData($newConfig);
-      $existingConfig->save();
-    }
-    else {
-      \Drupal::logger('leap_admin')->warning('Config file not found: ' . $configName);
-    }
+  // Check if the user is authenticated and has permission to access the toolbar.
+  if ($user->isAuthenticated() && $user->hasPermission('access toolbar')) {
+    $attachments['#attached']['library'][] = 'leap_admin/gin_toolbar_environment_indicator';
   }
 }

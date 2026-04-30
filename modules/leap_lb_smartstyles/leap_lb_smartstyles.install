@@ -1,5 +1,29 @@
 <?php
+
 /**
  * @file
- * Contains installation and update routines for Layout Builder - Smart Styles changes.
  */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Installation and update functions for the LEAP Starter - LB SmartStyles module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Provides a post-installation messenger alert with the required Drush recipe
+ * command to install the foundational spacing and alignment Layout Builder Styles
+ * config entities.
+ */
+function leap_lb_smartstyles_install(): void {
+  // Dynamically determine the path for the recipe command.
+  $module_path = \Drupal::service('extension.list.module')->getPath('leap_lb_smartstyles');
+  $command = "drush recipe $module_path/recipes/leap_lb_smartstyles";
+
+  \Drupal::messenger()->addWarning(t('The Splash Frog Layout Builder Smart Styles module has been enabled. <strong>To install the foundational spacing and alignment Layout Builder Styles, you must apply the associated recipe:</strong><br><br><code>@command</code>', [
+    '@command' => $command,
+  ]));
+}

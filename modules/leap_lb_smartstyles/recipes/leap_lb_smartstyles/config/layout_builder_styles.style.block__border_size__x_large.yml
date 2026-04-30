@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__border_size__x_large
+label: X-Large
+classes: "border\r\nborder-5"
+type: component
+group: block__border__size
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 7

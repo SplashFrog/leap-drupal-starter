@@ -1,5 +1,60 @@
 <?php
+
 /**
  * @file
- * Contains hooks for the module for Content.
  */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Hook implementations for the LEAP Starter - Content Lifecycle module.
+ *
+ * This module addresses significant edge-cases in Drupal Core's Content
+ * Moderation system, specifically regarding how nested, composite entities
+ * (like Layout Builder Inline Blocks and Paragraphs) inherit the "Published"
+ * state of their parent Node.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Provides documentation and usage examples for the Content Lifecycle module,
+ * including instructions on applying the core content types recipe.
+ */
+function leap_content_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.leap_content') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_content');
+    $command = "drush recipe $module_path/recipes/leap_content";
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('The Splash Frog Content Lifecycle module protects your site against a known Drupal Core issue where nested Layout Builder blocks and Paragraphs fail to publish when their parent entity is published from a draft state.') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the pre-configured Basic, Home, and Landing content types (with Layout Builder and Workflow support), you must run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    $output .= '<h3>' . t('Recursive Publishing Service') . '</h3>';
+    $output .= '<p>' . t('The module provides the <code>leap_content.recursive_publishing</code> service which hooks directly into the entity update cycle. No developer action is required; it automatically recursively publishes nested Draft revisions of Inline Blocks and Entity Reference Revisions (Paragraphs) whenever a host Node is fully published.') . '</p>';
+
+    return $output;
+  }
+
+  return '';
+}
+
+/**
+ * Implements hook_entity_update().
+ *
+ * Intercepts the save cycle of an entity to evaluate if its nested components
+ * need to be synchronized with its new "Published" state.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity that has just been updated.
+ */
+function leap_content_entity_update(EntityInterface $entity): void {
+  /** @var \Drupal\leap_content\Service\RecursivePublishingService $service */
+  $service = \Drupal::service('leap_content.recursive_publishing');
+  $service->handleRecursivePublishing($entity);
+}

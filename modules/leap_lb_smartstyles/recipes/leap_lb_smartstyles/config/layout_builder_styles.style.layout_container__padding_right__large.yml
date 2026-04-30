@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: layout_container__padding_right__large
+label: Large
+classes: pe-4
+type: section
+group: layout_padding_right
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -12

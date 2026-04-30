@@ -1,0 +1,7 @@
+name: 'Splash Frog - Smart Styles'
+description: 'Enables foundational Layout Builder Style groups and presets for alignment, spacing, and containers.'
+type: 'Site-Building'
+install:
+  - block_content
+  - layout_builder
+  - layout_builder_styles

@@ -3,3 +3,12 @@ services:
     class: Drupal\leap_admin\Routing\AdminRouteSubscriber
     tags:
       - { name: event_subscriber }
+
+  leap_admin.bulk_moderation:
+    class: Drupal\leap_admin\BulkModerationService
+    arguments:
+      - '@entity_type.manager'
+      - '@language_manager'
+      - '@current_user'
+      - '@datetime.time'
+      - '@logger.factory'

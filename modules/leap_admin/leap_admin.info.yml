@@ -1,18 +1,9 @@
 name: 'Splash Frog - Starter - Administrative Enhancements'
-core_version_requirement: ^10.4 || ^11
+core_version_requirement: ^11.3
 type: module
-version: '1.0.0'
-description: 'Provides an enhanced Content and Media management views, as well as custom actions, general pathauto patterns, etc. It is recommended to have first installed the other modules first, then this one.'
+version: '2.0.0'
+description: 'Provides custom action plugins and route subscribers for enhanced content administration.'
 package: 'Splash Frog'
 dependencies:
   - drupal:content_moderation
-  - drupal:field
-  - drupal:moderated_content_bulk_publish
   - drupal:node
-  - drupal:media
-  - drupal:path
-  - drupal:pathauto
-  - drupal:text
-  - drupal:user
-  - drupal:views
-  - drupal:workflows

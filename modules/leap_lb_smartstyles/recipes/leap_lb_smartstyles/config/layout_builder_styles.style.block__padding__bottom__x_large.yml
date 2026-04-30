@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__padding__bottom__x_large
+label: X-Large
+classes: pb-5
+type: component
+group: block__padding__bottom
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 62

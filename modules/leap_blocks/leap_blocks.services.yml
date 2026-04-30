@@ -1,0 +1,3 @@
+services:
+  leap_blocks.options_builder:
+    class: Drupal\leap_blocks\OptionsBuilderService

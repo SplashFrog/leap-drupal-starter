@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__margin__top__large
+label: Large
+classes: mt-4
+type: component
+group: block__margin__top
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 27

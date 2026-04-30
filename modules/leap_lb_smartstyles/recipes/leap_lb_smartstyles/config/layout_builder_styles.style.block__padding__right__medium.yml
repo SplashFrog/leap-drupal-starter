@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__padding__right__medium
+label: Medium
+classes: pe-3
+type: component
+group: block__padding__right
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 72

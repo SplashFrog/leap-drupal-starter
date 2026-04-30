@@ -1,0 +1,24 @@
+name: 'Splash Frog - Admin Enhancements'
+description: 'Provides enhanced Content and Media management views, custom bulk actions, and general pathauto patterns.'
+type: 'Site-Building'
+install:
+  - leap_admin
+  - content_moderation
+  - field
+  - moderated_content_bulk_publish
+  - node
+  - media
+  - path
+  - pathauto
+  - text
+  - user
+  - views
+  - workflows
+config:
+  strict: false
+  import:
+    leap_admin: '*'
+  actions:
+    views.view.moderated_content:
+      simple_config_update:
+        status: false

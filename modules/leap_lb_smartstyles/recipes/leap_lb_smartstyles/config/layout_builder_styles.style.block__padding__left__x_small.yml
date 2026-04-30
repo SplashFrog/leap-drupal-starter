@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__padding__left__x_small
+label: X-Small
+classes: ps-1
+type: component
+group: block__padding__left
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 64

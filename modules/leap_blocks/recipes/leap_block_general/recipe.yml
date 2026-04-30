@@ -1,0 +1,6 @@
+name: 'Splash Frog - General Block'
+description: 'Provides configuration for a basic "General" content block with a WYSIWYG editor.'
+type: 'Site-Building'
+install:
+  - block_content
+  - text

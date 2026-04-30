@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__border_color__addon_blue
+label: 'Alternative (Blue)'
+classes: "border\r\nlayout-border--addon-blue"
+type: component
+group: block__border__color
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 15

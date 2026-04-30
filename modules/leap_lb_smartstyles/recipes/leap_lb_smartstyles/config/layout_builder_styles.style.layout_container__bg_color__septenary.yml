@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: layout_container__bg_color__septenary
+label: 'Septenary (Teal)'
+classes: layout-bg--septenary
+type: section
+group: layout_bg_color
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -67

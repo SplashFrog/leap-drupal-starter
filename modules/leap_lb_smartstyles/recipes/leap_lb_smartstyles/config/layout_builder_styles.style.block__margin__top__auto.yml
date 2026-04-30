@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__margin__top__auto
+label: Auto
+classes: mt-auto
+type: component
+group: block__margin__top
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 29

@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__border_size__small
+label: Small
+classes: "border\r\nborder-2"
+type: component
+group: block__border__size
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 4

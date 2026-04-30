@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__bg_color__quaternary
+label: 'Quaternary (Light Gray)'
+classes: layout-bg--quaternary
+type: component
+group: block__general__bg_color
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -4

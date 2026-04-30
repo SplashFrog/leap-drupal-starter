@@ -1,5 +1,30 @@
 <?php
+
 /**
  * @file
- * Contains installation and update routines for Enhanced Blocks.
  */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Installation and update functions for the LEAP Starter - Block Utilities module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Provides a post-installation messenger alert with the required Drush recipe
+ * command. Note that applying the 'General Block' recipe is considered
+ * optional, unlike the strict Lego component recipes, as the core of this
+ * module is its global utility service.
+ */
+function leap_blocks_install(): void {
+  // Dynamically determine the path for the recipe command.
+  $module_path = \Drupal::service('extension.list.module')->getPath('leap_blocks');
+  $command = "drush recipe $module_path/recipes/leap_block_general";
+
+  \Drupal::messenger()->addWarning(t('The Splash Frog Block Utilities module has been enabled. <strong>To install the pre-configured General block type, you may optionally apply the associated recipe:</strong><br><br><code>@command</code>', [
+    '@command' => $command,
+  ]));
+}

@@ -1,16 +1,84 @@
 <?php
 
 /**
- * Implements template_preprocess_HOOK().
+ * @file
  */
-function leap_blocks_preprocess_field(&$variables) {
-  if (!array_key_exists('entity_id', $variables)) {
-    if (array_key_exists('#object', $variables['element'])) {
-      $entity = $variables['element']['#object'];
-      if (method_exists($entity, 'id')) {
-        $entityID = $entity->id();
-        $variables['entity_id'] = $entityID;
-      }
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Hook implementations for the LEAP Starter - Block Utilities module.
+ *
+ * This module provides global utilities for rendering Blocks and Fields.
+ * It also acts as the central provider for the `OptionsBuilderService`,
+ * a tool designed to map Drupal field values (like color pickers or
+ * alignment toggles) into clean arrays for SDCs and Twig templates.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Provides documentation and usage examples for the Block Utilities module,
+ * including a tutorial on how to use the OptionsBuilderService in custom
+ * themes or modules.
+ */
+function leap_blocks_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.leap_blocks') {
+    $module_path = \Drupal::service('extension.list.module')->getPath('leap_blocks');
+    $command = "drush recipe $module_path/recipes/leap_block_general";
+
+    $output = '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('The Block Utilities module provides the <code>leap_blocks.options_builder</code> service, designed to easily extract field values from an entity and format them into CSS-friendly arrays. This is especially useful for passing options to Twig templates or Single Directory Components (SDCs).') . '</p>';
+    $output .= '<h3>' . t('Installation Instructions') . '</h3>';
+    $output .= '<p>' . t('To install the pre-configured General block type, you may optionally run the following Drush command from your project root:') . '</p>';
+    $output .= '<pre><code>' . $command . '</code></pre>';
+    $output .= '<h3>' . t('How to Use') . '</h3>';
+    $output .= '<p>' . t('In your theme or module preprocess hook, call the service, pass a mapping of variable names to field names, and invoke <code>buildOptions()</code>.') . '</p>';
+    $output .= '<h4>' . t('Example Usage:') . '</h4>';
+    $output .= '<pre><code>';
+    $output .= "/** @var \\Drupal\\leap_blocks\\OptionsBuilderService \$builder */\n";
+    $output .= "\$builder = \\Drupal::service('leap_blocks.options_builder');\n\n";
+    $output .= "// Define which fields to extract.\n";
+    $output .= "\$builder->setFieldList([\n";
+    $output .= "  'bg_color' => 'field_background_color',\n";
+    $output .= "  'alignment' => 'field_text_alignment',\n";
+    $output .= "]);\n\n";
+    $output .= "// Generate the array (automatically converts underscores to dashes).\n";
+    $output .= "\$variables['theme_options'] = \$builder->buildOptions(\$block);\n";
+    $output .= '</code></pre>';
+    $output .= '<p>' . t('The resulting <code>theme_options</code> array can then be passed directly into an SDC as props or used as class names in your Twig templates.') . '</p>';
+
+    return $output;
+  }
+
+  return '';
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for field templates.
+ *
+ * Extracts the parent entity's ID and injects it into the field variables.
+ * This is incredibly useful for generating unique DOM IDs within field
+ * templates (e.g., ensuring a specific field wrapper has an ID tied to
+ * the exact block it belongs to).
+ */
+function leap_blocks_preprocess_field(array &$variables): void {
+  // Bail out early if it's already set by another preprocess.
+  if (isset($variables['entity_id'])) {
+    return;
+  }
+
+  // Ensure the underlying parent entity exists on the field element.
+  if (isset($variables['element']['#object'])) {
+    $entity = $variables['element']['#object'];
+
+    // Validate it is a true entity before calling id().
+    if ($entity instanceof EntityInterface && method_exists($entity, 'id')) {
+      $variables['entity_id'] = $entity->id();
     }
   }
 }

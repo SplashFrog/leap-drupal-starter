@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: layout_container__bg_color__addon_grey
+label: 'Alternative (Grey)'
+classes: layout-bg--grey
+type: section
+group: layout_bg_color
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -63

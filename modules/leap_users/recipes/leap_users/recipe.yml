@@ -1,0 +1,9 @@
+name: 'Splash Frog - User Accounts'
+description: 'Provides basic configuration for user accounts, including First Name and Last Name fields.'
+type: 'Site-Building'
+install:
+  - field
+  - text
+  - user
+config:
+  strict: false

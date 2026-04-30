@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: block__border_color__tertiary
+label: 'Tertiary (Gold/Yellow)'
+classes: "border\r\nlayout-border--tertiary"
+type: component
+group: block__border__color
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: 10

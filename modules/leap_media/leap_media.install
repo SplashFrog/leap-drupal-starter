@@ -1,10 +1,31 @@
 <?php
+
 /**
  * @file
- * Contains installation and update routines for Media.
+ */
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Installation and update functions for the LEAP Starter - Media module.
  */
 
 /**
  * Implements hook_install().
+ *
+ * Provides a post-installation messenger alert with the required Drush recipe
+ * command to scaffold the core Media Types. Because LEAP uses pure configuration
+ * recipes rather than `config/install` directories, this manual prompt is
+ * essential for guiding the site builder workflow.
  */
-function leap_media_install() { }
+function leap_media_install(): void {
+  // Use Drupal's extension list to dynamically determine the correct path to the module.
+  // This ensures the command is accurate regardless of the docroot structure.
+  $module_path = \Drupal::service('extension.list.module')->getPath('leap_media');
+  $command = "drush recipe $module_path/recipes/leap_media";
+
+  \Drupal::messenger()->addWarning(t('The Splash Frog Media Types module has been enabled. <strong>To complete the setup, you must apply the associated recipe:</strong><br><br><code>@command</code>', [
+    '@command' => $command,
+  ]));
+}

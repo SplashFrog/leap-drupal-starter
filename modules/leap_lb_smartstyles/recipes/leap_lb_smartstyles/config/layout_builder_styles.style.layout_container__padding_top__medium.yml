@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: layout_container__padding_top__medium
+label: Medium
+classes: pt-3
+type: section
+group: layout_padding_top
+block_restrictions: {  }
+layout_restrictions: {  }
+weight: -31
